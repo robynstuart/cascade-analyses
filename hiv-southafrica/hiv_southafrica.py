@@ -16,7 +16,7 @@ import numpy as np
 ## THINGS TO RUN
 torun = [
 "loadframework",
-# "saveframework",
+"saveframework",
 # "makedatabook",
 # "makeproject",
 # "loaddatabook",
@@ -38,10 +38,12 @@ torun = [
 
 ## BEGIN ANALYSES
 if "loadframework" in torun:
-    F = at.ProjectFramework('hiv_southafrica_framework.xlsx')
+    F = at.ProjectFramework('hiv_dyn_framework.xlsx')
+#    F = at.ProjectFramework('hiv_southafrica_framework.xlsx')
 
 if "saveframework" in torun:
-    F.save('hiv_southafrica_framework.xlsx")
+    F.save('hiv_dyn_framework.xlsx')
+#    F.save('hiv_southafrica_framework.xlsx")
 
 if "makedatabook" in torun:
     P = at.Project(framework=F)  # Create a project with an empty data structure.
