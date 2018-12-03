@@ -16,13 +16,13 @@ import numpy as np
 ## THINGS TO RUN
 torun = [
 "loadframework",
-"saveframework",
+# "saveframework",
 # "makedatabook",
-# "makeproject",
-# "loaddatabook",
-# "makeparset",
-# "runsim",
-# "plotcascade",
+"makeproject",
+"loaddatabook",
+"makeparset",
+"runsim",
+"plotcascade",
 # "makeblankprogbook",
 # "runsim_programs",
 # "makeplots",
@@ -38,17 +38,15 @@ torun = [
 
 ## BEGIN ANALYSES
 if "loadframework" in torun:
-    F = at.ProjectFramework('hiv_dyn_framework.xlsx')
-#    F = at.ProjectFramework('hiv_southafrica_framework.xlsx')
+    F = at.ProjectFramework('hiv_southafrica_framework.xlsx')
 
 if "saveframework" in torun:
-    F.save('hiv_dyn_framework.xlsx')
-#    F.save('hiv_southafrica_framework.xlsx")
+    F.save('hiv_southafrica_framework.xlsx')
 
 if "makedatabook" in torun:
     P = at.Project(framework=F)  # Create a project with an empty data structure.
-    args = {"num_pops": 2, "num_transfers": 0, "data_start": 2016, "data_end": 2019, "data_dt": 1.0}
-    P.create_databook(databook_path=TMPDIR + "hiv_southafrica_databook_blank.xlsx", **args)
+    args = {"num_pops": 10, "num_transfers": 0, "data_start": 2016, "data_end": 2019, "data_dt": 1.0}
+    P.create_databook(databook_path="hiv_southafrica_databook_blank.xlsx", **args)
 
 if "makeproject" in torun:
     P = at.Project(name="SA HIV project", framework=F, do_run=False)
@@ -69,7 +67,7 @@ if 'plotcascade' in torun:
 
 if "makeblankprogbook" in torun:
     filename = "hiv_southafrica_progbook_blank.xlsx"
-    P.make_progbook(filename, progs=6)
+    P.make_progbook(filename, progs=23)
 
 if "runsim_programs" in torun:
 
@@ -80,7 +78,7 @@ if "runsim_programs" in torun:
                                                                                 reconciliation_year=2016.,
                                                                                 unit_cost_bounds=0.2)
     instructions = at.ProgramInstructions(start_year=2016.)
-    newalloc = {'Passive case finding': 2000000}
+    newalloc = {'Client-initiated clinic-based testing': 2000000}
     parresults = P.run_sim(parset="default", result_name="default-noprogs")
     progresults = P.run_sim(parset="default", progset='default', progset_instructions=instructions,
                             result_name="default-progs")
