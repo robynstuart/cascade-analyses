@@ -17,12 +17,12 @@ torun = [
 "makeproject",          # Always required
 "loaddatabook",         # Always required
 "makeparset",           # Always required
-"runsim",             # Only required if you want to check the calibration
-"plotcascade",        # Only required if you want to check the calibration
+# "runsim",             # Only required if you want to check the calibration
+# "plotcascade",        # Only required if you want to check the calibration
 # "makeblankprogbook",  # Only required if framework has changed or if you want to use different programs
-#"loadprogbook",         # Always required
+"loadprogbook",         # Always required
 # "reconcile",          # Only required the first time you load a program book
-# "runsim_programs",    # Only required if you want to check the programs
+"runsim_programs",    # Only required if you want to check the programs
 # "budget_scenarios",   # Only required if you want to check the programs
 # "optimize",             # Main purpose of script
 ]
@@ -47,9 +47,9 @@ if "loaddatabook" in torun:
 
 if "makeparset" in torun:
     P.make_parset(name="default")
+    P.update_settings(sim_start=2014.0, sim_end=2020., sim_dt=1.)
 
 if "runsim" in torun:
-    P.update_settings(sim_start=2014.0, sim_end=2020., sim_dt=1.)
     P.run_sim(parset="default", result_name="default", store_results=True)
     at.export_results(P.results, 't2dm_poltava_blresults_0107.xlsx')
 #    P.calibrate(max_time=300, new_name="auto")
@@ -117,6 +117,8 @@ if "runsim_programs" in torun:
 #    print(outcomes)
 #    print(P.results[-1].get_variable('adults','pos_screen')[0].vals)
 #    print(P.results[0].get_variable('adults','pos_screen')[0].vals)
+#    print(progresults.get_variable('adults','treat_suc')[0].vals)
+#    print(parresults.get_variable('adults','treat_suc')[0].vals)
 
 
 if "budget_scenarios" in torun:
