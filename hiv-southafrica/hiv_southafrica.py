@@ -164,7 +164,7 @@ if "optimize" in torun:
 
     # DO OPTIMIZATION
     optimization = at.Optimization(name='default', adjustments=adjustments, measurables=measurables,
-                                   constraints=constraints) #, method='pso') # Use PSO because this example seems a bit susceptible to local minima with ASD
+                                   constraints=constraints, maxtime=10) #, method='pso') # Use PSO because this example seems a bit susceptible to local minima with ASD
 
 
     # COLLECT RESULTS
