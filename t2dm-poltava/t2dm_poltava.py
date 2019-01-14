@@ -17,12 +17,12 @@ torun = [
 "makeproject",          # Always required
 "loaddatabook",         # Always required
 "makeparset",           # Always required
-"runsim",             # Only required if you want to check the calibration
+# "runsim",             # Only required if you want to check the calibration
 # "plotcascade",        # Only required if you want to check the calibration
 # "makeblankprogbook",  # Only required if framework has changed or if you want to use different programs
-# "loadprogbook",         # Always required
+"loadprogbook",         # Always required
 # "reconcile",          # Only required the first time you load a program book
-# "runsim_programs",    # Only required if you want to check the programs
+"runsim_programs",    # Only required if you want to check the programs
 # "budget_scenarios",   # Only required if you want to check the programs
 # "optimize",             # Main purpose of script
 ]
@@ -56,6 +56,7 @@ if "runsim" in torun:
 #    P.run_sim(parset="auto", result_name="auto")
     print(P.results[-1].get_variable('adults','txs_vd')[0].vals+P.results[-1].get_variable('adults','txf_vd')[0].vals)
     print(P.results[-1].get_variable('adults','txs_uncomp')[0].vals+P.results[-1].get_variable('adults','txf_uncomp')[0].vals)
+    print((P.results[-1].get_variable('adults','txs_vd')[0].vals+P.results[-1].get_variable('adults','txf_vd')[0].vals)/((P.results[-1].get_variable('adults','txs_vd')[0].vals+P.results[-1].get_variable('adults','txf_vd')[0].vals)+(P.results[-1].get_variable('adults','txs_uncomp')[0].vals+P.results[-1].get_variable('adults','txf_uncomp')[0].vals)))
 
 if 'plotcascade' in torun:
     at.plot_multi_cascade(P.results[-1], pops='all', year=[2014,2015,2016,2017,2018,2019,2020], data=P.data)
@@ -110,7 +111,7 @@ if "runsim_programs" in torun:
         parresults = P.run_sim(parset="default", result_name="default", store_results=True)
         at.plot_multi_cascade([parresults, progresults], year=[2017])
 
-    at.export_results(P.results, 't2dm_poltava_results_0103.xlsx')
+    at.export_results(P.results, 't2dm_poltava_results_raw.xlsx')
 
 #    coverage = sc.odict([('Blood glucose test (PHC level)', np.array([0.0164])),
 #                      ('Blood glucose test (Feldsher post family nurse)', np.array([0.0062])),
