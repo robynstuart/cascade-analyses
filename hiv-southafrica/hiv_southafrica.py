@@ -16,14 +16,14 @@ torun = [
 "makeproject",          # Always required
 "loaddatabook",         # Always required
 "makeparset",           # Always required
-# "runsim",             # Only required if you want to check the calibration
-# "plotcascade",        # Only required if you want to check the calibration
+"runsim",             # Only required if you want to check the calibration
+"plotcascade",        # Only required if you want to check the calibration
 # "makeblankprogbook",  # Only required if framework has changed or if you want to use different programs
-"loadprogbook",         # Always required
+# "loadprogbook",         # Always required
 # "reconcile",          # Only required the first time you load a program book
 # "runsim_programs",    # Only required if you want to check the programs
 # "budget_scenarios",   # Only required if you want to check the programs
-"optimize",             # Main purpose of script
+# "optimize",             # Main purpose of script
 ]
 
 load_reconciled = True
@@ -34,7 +34,7 @@ if "loadframework" in torun:
 
 if "makedatabook" in torun:
     P = at.Project(framework=F)  # Create a project with an empty data structure based on the model framework
-    args = {"num_pops": 10, "num_transfers": 0, "data_start": 2016, "data_end": 2019, "data_dt": 1.0}
+    args = {"num_pops": 10, "num_transfers": 0, "data_start": 2017, "data_end": 2019, "data_dt": 1.0}
     P.create_databook(databook_path="hiv_southafrica_databook_blank.xlsx", **args)
 
 if "makeproject" in torun:
@@ -47,19 +47,22 @@ if "makeparset" in torun:
     P.make_parset(name="default")
 
 if "runsim" in torun:
-    P.update_settings(sim_start=2016.0, sim_end=2030, sim_dt=0.25)
+    P.update_settings(sim_start=2017.0, sim_end=2030, sim_dt=0.25)
     P.run_sim(parset="default", result_name="default", store_results=True)
 #    P.calibrate(max_time=300, new_name="auto")
 #    P.run_sim(parset="auto", result_name="auto")
 
     # Print estimates of the number of new infections
     inf = sc.odict()
+    death = sc.odict()
     for pname in P.results[-1].pop_names:
         inf[pname] = P.results[-1].get_variable(pname, 'num_acq')[0].vals
+        death[pname] = P.results[-1].get_variable(pname, 'num_hiv_deaths')[0].vals
     print(inf[:][:,0:10].sum(axis=0))
+    print(death[:][:,0:10].sum(axis=0))
 
 if 'plotcascade' in torun:
-    at.plot_multi_cascade(P.results[-1], pops='all', year=[2016,2017,2020], data=P.data)
+    at.plot_multi_cascade(P.results[-1], pops='all', year=[2017,2018,2020], data=P.data)
     pl.show()
 
 if "makeblankprogbook" in torun:
