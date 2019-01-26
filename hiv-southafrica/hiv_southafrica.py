@@ -226,7 +226,7 @@ if "optimize" in torun:
         inf_op[pname] = optimized_result.get_variable(pname, 'num_acq')[0].vals
         dea_bl[pname] = unoptimized_result.get_variable(pname, 'num_hiv_deaths')[0].vals
         dea_op[pname] = optimized_result.get_variable(pname, 'num_hiv_deaths')[0].vals
-    indices = [4,8,12,16,20,24]
+    indices = [8,12,16,20,24]
 
     print("Baseline infections by year: %s" % (inf_bl[:][:,indices].sum(axis=0)))
     print(" Optimal infections by year: %s" % (inf_op[:][:,indices].sum(axis=0)))
