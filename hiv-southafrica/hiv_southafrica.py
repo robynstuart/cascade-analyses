@@ -16,17 +16,17 @@ torun = [
 "makeproject",          # Always required
 "loaddatabook",         # Always required
 "makeparset",           # Always required
-# "runsim",             # Only required if you want to check the calibration
+"runsim",             # Only required if you want to check the calibration
 # "plotcascade",        # Only required if you want to check the calibration
 # "makeblankprogbook",  # Only required if framework has changed or if you want to use different programs
 "loadprogbook",         # Always required
 # "reconcile",          # Only required the first time you load a program book
-"runsim_programs",    # Only required if you want to check the programs
+# "runsim_programs",    # Only required if you want to check the programs
 # "budget_scenarios",   # Only required if you want to check the programs
-# "optimize",             # Main purpose of script
+"optimize",             # Main purpose of script
 ]
 
-load_reconciled = True
+load_reconciled = False
 
 ## BEGIN ANALYSES
 if "loadframework" in torun:
@@ -80,18 +80,18 @@ if "reconcile" in torun:
     original_progset = P.progsets[0]
     reconciled_progset, progset_comparison, parameter_comparison = at.reconcile(project=P, parset=parset,
                                                                                 progset=original_progset,
-                                                                                reconciliation_year=2016.,
+                                                                                reconciliation_year=2017.,
                                                                                 max_time=100,
                                                                                 baseline_bounds=0.75,
                                                                                 outcome_bounds=0.75,
-                                                                                unit_cost_bounds=0.1)
-    instructions = at.ProgramInstructions(start_year=2016.)
+                                                                                unit_cost_bounds=0.0)
+    instructions = at.ProgramInstructions(start_year=2017.)
     parresults = P.run_sim(parset="default", result_name="default-noprogs", store_results=True)
     progresults = P.run_sim(parset="default", progset='default', progset_instructions=instructions,
                             result_name="default-progs", store_results=True)
     recresults = P.run_sim(parset="default", progset=reconciled_progset, progset_instructions=instructions,
                             result_name="reconciled-progs", store_results=True)
-    at.plot_multi_cascade([parresults, progresults, recresults], year=[2017])
+    at.plot_multi_cascade([parresults, progresults, recresults], year=[2018])
 
     reconciled_progset.save("hiv_southafrica_progbook_reconciled.xlsx")
 
@@ -102,11 +102,12 @@ if "runsim_programs" in torun:
 
     parset = P.parsets[0]
     original_progset = P.progsets[0]
-    instructions = at.ProgramInstructions(start_year=2016.)
+    instructions = at.ProgramInstructions(start_year=2017.)
     parresults = P.run_sim(parset="default", result_name="default-noprogs", store_results=True)
     progresults = P.run_sim(parset="default", progset='default', progset_instructions=instructions,
                             result_name="default-progs", store_results=True)
-    at.plot_multi_cascade([parresults, progresults], year=[2017])
+    at.plot_multi_cascade(cascade='Extended HIV care cascade', results=[parresults, progresults], year=[2018])
+    at.plot_multi_cascade(cascade='Extended HIV care cascade', results=progresults, year=[2018,2019,2020,2021,2022])
 
 
 if "budget_scenarios" in torun:
@@ -126,48 +127,75 @@ if "budget_scenarios" in torun:
 if "optimize" in torun:
 
     # SET BASELINE SPENDING
+#    alloc = sc.odict([
+    #            ("Client-initiated clinic-based testing",at.TimeSeries([2018,2022],[53354825,70272330])),
+    #       ("Provider-initiated testing",at.TimeSeries([2018,2022],[1958157,2579040])),
+    #       ("Mobile testing",at.TimeSeries([2018,2022],[1937319,2551596])),
+    #       ("Door-to-door testing",at.TimeSeries([2018,2022],[1430195,1883675])),
+    #       ("Workplace testing",at.TimeSeries([2018,2022],[670563,883182])),
+    #       ("Youth-friendly  SRH testing",at.TimeSeries([2018,2022],[716945,944271])),
+    #       ("Self-testing",at.TimeSeries([2018,2022],[847315,1115978])),
+    #       ("CD4 testing",at.TimeSeries([2018,2022],[3995486,5262357])),
+    #       ("Community support - link to care",at.TimeSeries([2018,2022],[350468,461593])),
+    #       ("Additional education (prof)",at.TimeSeries([2018,2022],[231217,304530])),
+    #       ("Additional education (lay)",at.TimeSeries([2018,2022],[16105,21211])),
+    #       ("Classic ART initiation",at.TimeSeries([2018,2022],[1558316,2052420])),
+    #       ("Fast-track ART initiation",at.TimeSeries([2018,2022],[376159,495429])),
+    #       ("Same day ART initiation",at.TimeSeries([2018,2022],[97778,128781])),
+    #       ("Community support - adherence",at.TimeSeries([2018,2022],[910142,1198725])),
+    #       ("WhatsApp messaging - adherence",at.TimeSeries([2018,2022],[449,592])),
+    #       ("Tracing of ART clients",at.TimeSeries([2018,2022],[825759,1087587])),
+    #       ("Enhanced adherence (prof)",at.TimeSeries([2018,2022],[1325445,1745710])),
+    #       ("Enhanced adherence (lay)",at.TimeSeries([2018,2022],[91212,120134])),
+    #       ("Facility-based ART dispensing",at.TimeSeries([2018,2022],[274906358,362072411])),
+    #       ("Decentralized delivery",at.TimeSeries([2018,2022],[4604686,6064719])),
+    #       ("Adherence clubs",at.TimeSeries([2018,2022],[14197414,18699066])),
+    #       ("PMTCT",at.TimeSeries([2018,2022],[15727557,20714379]))])
     alloc = sc.odict([
-            ("Client-initiated clinic-based testing",at.TimeSeries([2017,2018,2019,2020,2021,2022],[52472254,55443655,62508819,75795653,79585435,83564707])),#???
-            ("Provider-initiated testing",at.TimeSeries([2017,2018,2019,2020,2021,2022],[1925766,2034818,2294114,2781750,2920837,3066879])),
-            ("Mobile testing",at.TimeSeries([2017,2018,2019,2020,2021,2022],[1905274,2013166,2269703,2752150,2889757,3034245])),
-            ("Door-to-door testing",at.TimeSeries([2017,2018,2019,2020,2021,2022],[1406539,1486188,1675573,2031731,2133318,2239984])),
-            ("Workplace testing",at.TimeSeries([2017,2018,2019,2020,2021,2022],[659472,696817,785612,952601,1000231,1050243])),
-            ("Youth-friendly  SRH testing",at.TimeSeries([2017,2018,2019,2020,2021,2022],[705089,745016,839954,1018494,1069418,1122889])),
-            ("Self-testing",at.TimeSeries([2017,2018,2019,2020,2021,2022],[833300,880488,992689,1203694,1263879,1327073])),
-            ("CD4 testing",at.TimeSeries([2017,2018,2019,2020,2021,2022],[855224,903654,1018806,1235363,1297131,1361988])),
-            ("Community support - link to care",at.TimeSeries([2017,2018,2019,2020,2021,2022],[448284,473670,534029,647542,679919,713915])),
-            ("Additional education (prof)",at.TimeSeries([2017,2018,2019,2020,2021,2022],[803548,849051,957245,1160717,1218753,1279690])),
-            ("Additional education (lay)",at.TimeSeries([2017,2018,2019,2020,2021,2022],[281242,297168,335036,406251,426563,447892])), #???
-            ("Classic ART initiation",at.TimeSeries([2017,2018,2019,2020,2021,2022],[1453013,1535294,1730936,2098863,2203806,2313996])),
-            ("Fast-track ART initiation",at.TimeSeries([2017,2018,2019,2020,2021,2022],[145845,154104,173742,210672,221206,232266])),#???
-            ("Same day ART initiation",at.TimeSeries([2017,2018,2019,2020,2021,2022],[72924,77053,86872,105338,110605,116135])),
-            ("Community support - adherence",at.TimeSeries([2017,2018,2019,2020,2021,2022],[1404456,1483988,1673092,2028723,2130160,2236668])),
-            ("WhatsApp messaging - adherence",at.TimeSeries([2017,2018,2019,2020,2021,2022],[10168,10744,12113,14688,15422,16193])),
-            ("Tracing of ART clients",at.TimeSeries([2017,2018,2019,2020,2021,2022],[829899,876895,988637,1198782,1258721,1321657])),
-            ("Enhanced adherence (prof)",at.TimeSeries([2017,2018,2019,2020,2021,2022],[1312675,1387009,1563755,1896145,1990953,2090500])),#???
-            ("Enhanced adherence (lay)",at.TimeSeries([2017,2018,2019,2020,2021,2022],[157523,166443,187652,227540,238917,250863])),#???
-            ("Facility-based ART dispensing",at.TimeSeries([2017,2018,2019,2020,2021,2022],[152880716,161538050,182122785,220834684,231876419,243470240])),#???
-            ("Decentralized delivery",at.TimeSeries([2017,2018,2019,2020,2021,2022],[24543302,25933141,29237792,35452558,37225186,39086445])),
-            ("Adherence clubs",at.TimeSeries([2017,2018,2019,2020,2021,2022],[11385988,12030754,13563828,16446947,17269294,18132759])),
-            ("PMTCT",at.TimeSeries([2017,2018,2019,2020,2021,2022],[26006258,27478942,30980573,37565783,39444073,41416276]))])
+            ("Client-initiated clinic-based testing",at.TimeSeries([2017,2022],[53354825,70272330])),
+            ("Provider-initiated testing",at.TimeSeries([2017,2022],[1958157,2579040])),
+            ("Mobile testing",at.TimeSeries([2017,2022],[1937319,2551596])),
+            ("Door-to-door testing",at.TimeSeries([2017,2022],[1430195,1883675])),
+            ("Workplace testing",at.TimeSeries([2017,2022],[670563,883182])),
+            ("Youth-friendly  SRH testing",at.TimeSeries([2017,2022],[716945,944271])),
+            ("Self-testing",at.TimeSeries([2017,2022],[847315,1115978])),
+            ("CD4 testing",at.TimeSeries([2017,2022],[3995486,5262357])),
+            ("Community support - link to care",at.TimeSeries([2017,2022],[350468,461593])),
+            ("Additional education (prof)",at.TimeSeries([2017,2022],[231217,304530])),
+            ("Additional education (lay)",at.TimeSeries([2017,2022],[16105,21211])),
+            ("Classic ART initiation",at.TimeSeries([2017,2022],[1558316,2052420])),
+            ("Fast-track ART initiation",at.TimeSeries([2017,2022],[376159,495429])),
+            ("Same day ART initiation",at.TimeSeries([2017,2022],[97778,128781])),
+            ("Community support - adherence",at.TimeSeries([2017,2022],[910142,1198725])),
+            ("WhatsApp messaging - adherence",at.TimeSeries([2017,2022],[449,592])),
+            ("Tracing of ART clients",at.TimeSeries([2017,2022],[825759,1087587])),
+            ("Enhanced adherence (prof)",at.TimeSeries([2017,2022],[1325445,1745710])),
+            ("Enhanced adherence (lay)",at.TimeSeries([2017,2022],[91212,120134])),
+            ("Facility-based ART dispensing",at.TimeSeries([2017,2022],[274906358,362072411])),
+            ("Decentralized delivery",at.TimeSeries([2017,2022],[4604686,6064719])),
+            ("Adherence clubs",at.TimeSeries([2017,2022],[14197414,18699066])),
+            ("PMTCT",at.TimeSeries([2017,2022],[15727557,20714379]))])
 
-    instructions = at.ProgramInstructions(alloc=alloc,start_year=2017) # Instructions for default spending
+    instructions = at.ProgramInstructions(alloc=alloc,start_year=2017.) # Instructions for default spending
 
     # SET ADJUSTMENTS
     adjustments = []
     for progname in P.progsets[0].programs.keys():
-        adjustments.append(at.SpendingAdjustment(progname, [2017,2018,2019,2020,2021,2022], 'rel', 0., 100.))
+        if progname != 'PMTCT':
+            adjustments.append(at.SpendingAdjustment(progname, [2017,2022], 'rel', 0., 100.))
+        else:
+            adjustments.append(at.SpendingAdjustment('PMTCT', [2017,2022], 'rel', 0., 100.))
 
     # SET CONSTRAINTS - THIS INCLUDES BUDGET RAMP-UP
-    constraints = at.TotalSpendConstraint(t=[2017,2018,2019,2020,2021,2022],total_spend=[282498759,298496108,336533358,408066668,428470001,449893502]) # Cap total spending in all years
+    constraints = at.TotalSpendConstraint(t=[2017,2022],total_spend=[380129870, 500659714]) # Cap total spending in all years
 
     # SET CASCADE MEASURABLE
     measurables = at.MaximizeCascadeConversionRate('HIV care cascade', [2022],
-                                                   pop_names='all')  # NB. make sure the objective year is later than the program start year, otherwise no time for any changes
+                                                   pop_names='all')
 
     # DO OPTIMIZATION
     optimization = at.Optimization(name='default', adjustments=adjustments, measurables=measurables,
-                                   constraints=constraints, maxtime=10) #, method='pso') # Use PSO because this example seems a bit susceptible to local minima with ASD
+                                   constraints=constraints) #, method='pso')
 
 
     # COLLECT RESULTS
@@ -180,7 +208,7 @@ if "optimize" in torun:
 
 
     # MAKE CASCADE PLOT
-    at.plot_multi_cascade([unoptimized_result, optimized_result], year=[2022], pops=['Males 25-34'])
+    at.plot_multi_cascade([unoptimized_result, optimized_result], year=[2022])
 
     # MAKE PLOTS TO COMPARE BUDGETS
     d = at.PlotData.programs([optimized_result, unoptimized_result], t_bins=[2017, 2023])
@@ -213,4 +241,4 @@ if "optimize" in torun:
     print("          Reduction in deaths: %s" % ((dea_bl[:][:,indices].sum()-dea_op[:][:,indices].sum())/dea_bl[:][:,indices].sum()))
 
     # EXPORT RESULTS
-    at.export_results(P.results, 'hiv_southafrica_results_0103.xlsx')
+#    at.export_results(P.results, 'hiv_southafrica_results_0103.xlsx')
