@@ -51,9 +51,12 @@ if "makeparset" in torun:
 
 if "runsim" in torun:
     P.run_sim(parset="default", result_name="default", store_results=True)
-    at.export_results(P.results, 't2dm_poltava_blresults_0107.xlsx')
+#    at.export_results(P.results, 't2dm_poltava_blresults_0107.xlsx')
 #    P.calibrate(max_time=300, new_name="auto")
 #    P.run_sim(parset="auto", result_name="auto")
+    print(P.results[-1].get_variable('adults','txs_vd')[0].vals+P.results[-1].get_variable('adults','txf_vd')[0].vals)
+    print(P.results[-1].get_variable('adults','txs_uncomp')[0].vals+P.results[-1].get_variable('adults','txf_uncomp')[0].vals)
+    print((P.results[-1].get_variable('adults','txs_vd')[0].vals+P.results[-1].get_variable('adults','txf_vd')[0].vals)/((P.results[-1].get_variable('adults','txs_vd')[0].vals+P.results[-1].get_variable('adults','txf_vd')[0].vals)+(P.results[-1].get_variable('adults','txs_uncomp')[0].vals+P.results[-1].get_variable('adults','txf_uncomp')[0].vals)))
 
 if 'plotcascade' in torun:
     at.plot_multi_cascade(P.results[-1], pops='all', year=[2014,2015,2016,2017,2018,2019,2020], data=P.data)
@@ -108,7 +111,7 @@ if "runsim_programs" in torun:
         parresults = P.run_sim(parset="default", result_name="default", store_results=True)
         at.plot_multi_cascade([parresults, progresults], year=[2017])
 
-    at.export_results(P.results, 't2dm_poltava_results_0103.xlsx')
+    at.export_results(P.results, 't2dm_poltava_results_raw.xlsx')
 
 #    coverage = sc.odict([('Blood glucose test (PHC level)', np.array([0.0164])),
 #                      ('Blood glucose test (Feldsher post family nurse)', np.array([0.0062])),
