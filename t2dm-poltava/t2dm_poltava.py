@@ -24,7 +24,7 @@ torun = [
 # "reconcile",          # Only required the first time you load a program book
 "runsim_programs",    # Only required if you want to check the programs
 # "budget_scenarios",   # Only required if you want to check the programs
-# "optimize",             # Main purpose of script
+"optimize",             # Main purpose of script
 ]
 
 load_reconciled = False
@@ -105,13 +105,13 @@ if "runsim_programs" in torun:
     progresults = P.run_sim(parset="default", progset='default', progset_instructions=instructions,
                             result_name="default-progs", store_results=True)
 
-    at.plot_multi_cascade(progresults, year=[2016,2017,2018,2019,2020])
+#    at.plot_multi_cascade(progresults, year=[2016,2017,2018,2019,2020])
 
     if compare:
         parresults = P.run_sim(parset="default", result_name="default", store_results=True)
         at.plot_multi_cascade([parresults, progresults], year=[2017])
 
-    at.export_results(P.results, 't2dm_poltava_results_raw.xlsx')
+#    at.export_results(P.results, 't2dm_poltava_results_raw.xlsx')
 
 #    coverage = sc.odict([('Blood glucose test (PHC level)', np.array([0.0164])),
 #                      ('Blood glucose test (Feldsher post family nurse)', np.array([0.0062])),
@@ -143,41 +143,58 @@ if "budget_scenarios" in torun:
 if "optimize" in torun:
 
     # SET BASELINE SPENDING
-    instructions = at.ProgramInstructions(start_year=2016) # Instructions for default spending
+    instructions = at.ProgramInstructions(start_year=2019) # Instructions for default spending
 
     # SET ADJUSTMENTS
     adjustments = []
     for progname in P.progsets[0].programs.keys():
-        adjustments.append(at.SpendingAdjustment(progname, [2016,2017,2018,2019,2020,2021,2022], 'rel', 0., 100.))
+        adjustments.append(at.SpendingAdjustment(progname, [2019,2020,2021,2022,2023,2024,2025], 'rel', 0., 100.))
+
+    # SET CASCADE MEASURABLE
+    measurables = at.MaximizeCascadeConversionRate('Diabetes care cascade', [2025],
+                                                   pop_names='adults')
 
     # SET CONSTRAINTS
     constraints = at.TotalSpendConstraint() # Cap total spending in all years
 
-    # SET CASCADE MEASURABLE
-    measurables = at.MaximizeCascadeConversionRate('Diabetes care cascade', [2022],
-                                                   pop_names='all')
+    # CREATE OPTIMIZATION
+    optimization = at.Optimization(name='default', adjustments=adjustments, measurables=measurables,constraints=constraints)
 
     # DO OPTIMIZATION
-    optimization = at.Optimization(name='default', adjustments=adjustments, measurables=measurables,
-                                   constraints=constraints)
+    def run_optimization(proj, optimization, instructions):
+        unoptimized_result = proj.run_sim(parset=proj.parsets["default"], progset=proj.progsets['default'],
+                                          progset_instructions=instructions, result_name="unoptimized")
+        optimized_instructions = at.optimize(proj, optimization, parset=proj.parsets["default"],
+                                             progset=proj.progsets['default'], instructions=instructions)
+        optimized_result = proj.run_sim(parset=proj.parsets["default"], progset=proj.progsets['default'],
+                                        progset_instructions=optimized_instructions, result_name="optimized")
+        return unoptimized_result, optimized_result
 
-
-    # COLLECT RESULTS
-    unoptimized_result = P.run_sim(parset=P.parsets["default"], progset=P.progsets['default'],
-                                   progset_instructions=instructions, result_name="unoptimized", store_results=True)
-    optimized_instructions = at.optimize(P, optimization, parset=P.parsets["default"],
-                                         progset=P.progsets['default'], instructions=instructions)
-    optimized_result = P.run_sim(parset=P.parsets["default"], progset=P.progsets['default'],
-                                 progset_instructions=optimized_instructions, result_name="optimized", store_results=True)
-
+    (unoptimized_result,optimized_result) = run_optimization(P, optimization, instructions)
 
     # MAKE CASCADE PLOT
-    at.plot_multi_cascade([unoptimized_result, optimized_result], year=[2022])
+    at.plot_multi_cascade([unoptimized_result, optimized_result], year=[2025])
+
+#    d = at.PlotData([unoptimized_result, optimized_result], outputs=['ch_all'],project=P)
+#    at.plot_series(d, axis="results")
+
+
+
+
+#    # COLLECT RESULTS
+#    unoptimized_result = P.run_sim(parset="default", progset="default",
+#                                   progset_instructions=instructions, result_name="unoptimized", store_results=True)
+#    optimized_instructions = at.optimize(P, optimization, parset="default",
+#                                         progset="default", instructions=instructions)
+#    optimized_result = P.run_sim(parset="default", progset="default",
+#                                 progset_instructions=optimized_instructions, result_name="optimized", store_results=True)
+
+
 
     # MAKE PLOTS TO COMPARE BUDGETS
-    d = at.PlotData.programs([optimized_result, unoptimized_result])
-    d.interpolate(2018)
-    at.plot_bars(d, stack_outputs='all')
+#    d = at.PlotData.programs([optimized_result, unoptimized_result])
+#    d.interpolate(2019)
+#    at.plot_bars(d, stack_outputs='all')
 
     # EXPORT RESULTS
 #    at.export_results(P.results, 't2dm_poltava_results_0103.xlsx')
