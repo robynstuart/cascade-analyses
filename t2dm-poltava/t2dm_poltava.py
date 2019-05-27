@@ -3,6 +3,8 @@
 Script to analyse the T2DM care cascade in Poltava
 """
 
+import matplotlib
+matplotlib.use("TkAgg")
 
 ## IMPORTS
 import atomica as at
@@ -22,7 +24,7 @@ torun = [
 # "makeblankprogbook",  # Only required if framework has changed or if you want to use different programs
 "loadprogbook",         # Always required
 # "reconcile",          # Only required the first time you load a program book
-"runsim_programs",    # Only required if you want to check the programs
+# "runsim_programs",    # Only required if you want to check the programs
 # "budget_scenarios",   # Only required if you want to check the programs
 "optimize",             # Main purpose of script
 ]
@@ -47,7 +49,7 @@ if "loaddatabook" in torun:
 
 if "makeparset" in torun:
     P.make_parset(name="default")
-    P.update_settings(sim_start=2014.0, sim_end=2020., sim_dt=1.)
+    P.update_settings(sim_start=2014.0, sim_end=2025., sim_dt=1.)
 
 if "runsim" in torun:
     P.run_sim(parset="default", result_name="default", store_results=True)
@@ -105,7 +107,7 @@ if "runsim_programs" in torun:
     progresults = P.run_sim(parset="default", progset='default', progset_instructions=instructions,
                             result_name="default-progs", store_results=True)
 
-#    at.plot_multi_cascade(progresults, year=[2016,2017,2018,2019,2020])
+    at.plot_multi_cascade(progresults, year=[2016,2017,2018,2019,2020])
 
     if compare:
         parresults = P.run_sim(parset="default", result_name="default", store_results=True)
@@ -148,14 +150,15 @@ if "optimize" in torun:
     # SET ADJUSTMENTS
     adjustments = []
     for progname in P.progsets[0].programs.keys():
-        adjustments.append(at.SpendingAdjustment(progname, [2019,2020,2021,2022,2023,2024,2025], 'rel', 0., 100.))
+#        adjustments.append(at.SpendingAdjustment(progname, [2016,2017,2018,2019,2020,2021,2022], 'rel', 0., 100.))
+        adjustments.append(at.SpendingAdjustment(progname, [2019,2025], 'rel', 1., 100.))
 
     # SET CASCADE MEASURABLE
-    measurables = at.MaximizeCascadeConversionRate('Diabetes care cascade', [2025],
-                                                   pop_names='adults')
+    measurables = at.MaximizeCascadeStage('Diabetes care cascade', [2025])
+#    measurables = at.MaximizeCascadeConversionRate('Diabetes care cascade', [2022])
 
     # SET CONSTRAINTS
-    constraints = at.TotalSpendConstraint() # Cap total spending in all years
+    constraints = at.TotalSpendConstraint(t=[2019,2025],total_spend=[9414604.237*1.2, 9414604.237*1.2*(1.02)**5]) # Cap total spending in all years
 
     # CREATE OPTIMIZATION
     optimization = at.Optimization(name='default', adjustments=adjustments, measurables=measurables,constraints=constraints)
@@ -175,26 +178,10 @@ if "optimize" in torun:
     # MAKE CASCADE PLOT
     at.plot_multi_cascade([unoptimized_result, optimized_result], year=[2025])
 
-#    d = at.PlotData([unoptimized_result, optimized_result], outputs=['ch_all'],project=P)
-#    at.plot_series(d, axis="results")
-
-
-
-
-#    # COLLECT RESULTS
-#    unoptimized_result = P.run_sim(parset="default", progset="default",
-#                                   progset_instructions=instructions, result_name="unoptimized", store_results=True)
-#    optimized_instructions = at.optimize(P, optimization, parset="default",
-#                                         progset="default", instructions=instructions)
-#    optimized_result = P.run_sim(parset="default", progset="default",
-#                                 progset_instructions=optimized_instructions, result_name="optimized", store_results=True)
-
-
-
     # MAKE PLOTS TO COMPARE BUDGETS
-#    d = at.PlotData.programs([optimized_result, unoptimized_result])
-#    d.interpolate(2019)
-#    at.plot_bars(d, stack_outputs='all')
+    d = at.PlotData.programs([optimized_result, unoptimized_result])
+    d.interpolate(2025)
+    at.plot_bars(d, stack_outputs='all')
 
     # EXPORT RESULTS
-#    at.export_results(P.results, 't2dm_poltava_results_0103.xlsx')
+    at.export_results([optimized_result, unoptimized_result], 't2dm_poltava_results_0502.xlsx')
