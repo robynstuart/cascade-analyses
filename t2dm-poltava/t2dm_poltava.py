@@ -24,9 +24,9 @@ torun = [
 # "makeblankprogbook",  # Only required if framework has changed or if you want to use different programs
 "loadprogbook",         # Always required
 # "reconcile",          # Only required the first time you load a program book
-# "runsim_programs",    # Only required if you want to check the programs
+"runsim_programs",    # Only required if you want to check the programs
 # "budget_scenarios",   # Only required if you want to check the programs
-"optimize",             # Main purpose of script
+#"optimize",             # Main purpose of script
 ]
 
 load_reconciled = False
